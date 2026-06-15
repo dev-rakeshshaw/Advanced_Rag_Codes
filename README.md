@@ -2,6 +2,9 @@
 
 A comprehensive collection of code implementations covering the full spectrum of **Retrieval-Augmented Generation (RAG)** techniques — from foundational building blocks to advanced, production-ready patterns.
 
+>[!IMPORTANT] 
+> NOTES 📝: Get the OneNote notes from the drive link. [Click Here](https://drive.google.com/file/d/10x1GKlGKKHfEBJ18unXMBGCcQA0oy0N3/view?usp=sharing) to download your notes.
+
 ---
 
 ## 🗂️ Repository Structure
