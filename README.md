@@ -22,6 +22,7 @@ A comprehensive collection of code implementations covering the full spectrum of
 | `12_rag_multimodal` | Multimodal RAG handling text, images and tables in a single document |
 | `13_rag_evaluation` | Evaluation frameworks (RAGAS) and metrics to measure RAG pipeline performance |
 | `14_rag_papeer_project` | End-to-end RAG project built around research papers assistance and fact/claim verification |
+| `15_rag_guardrails` | Apply guardrails over your RAG pipeline covering input, context and output guardrails |
 
 ---
 
@@ -88,6 +89,7 @@ The folders are numbered to reflect a **recommended learning path** — start fr
 - **Graph RAG** — Leveraging knowledge graphs alongside vector retrieval
 - **Multimodal RAG** — Processing and retrieving across text and image modalities
 - **RAG Evaluation** — RAGAS and other frameworks for measuring faithfulness, relevance, and correctness
+- **RAG Guardrails** - Guardrails AI to implement guardrails on RAG pipeline, setting rules/LLMs as Judge over input, retrieved context and response
 
 ---
 
