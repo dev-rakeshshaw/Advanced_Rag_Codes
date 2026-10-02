@@ -8,7 +8,7 @@ from langchain_core.runnables import RunnableSequence, Runnable
 
 log_path = Path(__file__).parent / "logs.log"
 
-handler = logging.FileHandler(log_path)
+handler = logging.FileHandler(log_path, encoding="utf-8")
 handler.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter(
     fmt="%(asctime)s - %(message)s",
