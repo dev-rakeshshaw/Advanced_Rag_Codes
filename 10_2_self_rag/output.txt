@@ -1,0 +1,114 @@
+===== SELF-RAG RESULT =====
+
+Question: What is machine learning?
+Need Retrieval: False
+Retrieval Query: What is machine learning?
+Rewrite Tries: 0
+Support Revision Tries: 0
+IsSUP: N/A
+Evidence: []
+IsUSE: N/A
+Usefulness Reason: 
+
+Final Answer:
+
+Machine learning is a subfield of artificial intelligence that focuses on developing algorithms and statistical models that enable computers to learn from data and improve their performance on a specific task without being explicitly programmed for every possible scenario. Instead of following fixed, hand‑crafted rules, a machine‑learning system identifies patterns, makes predictions, or makes decisions by analyzing examples (training data) and then generalizing that knowledge to new, unseen data. Common approaches include supervised learning (learning from labeled examples), unsupervised learning (discovering structure in unlabeled data), and reinforcement learning (learning through trial‑and‑error interactions with an environment).
+
+==========================
+
+===== SELF-RAG RESULT =====
+
+Question: What is NexaAI's annual leave policy?
+Need Retrieval: True
+Retrieval Query: What is NexaAI's annual leave policy?
+Rewrite Tries: 0
+Support Revision Tries: 0
+IsSUP: fully_supported
+Evidence: ['Annual Leave: 18 working days per year']
+IsUSE: useful
+Usefulness Reason: Answer directly provides the requested annual leave policy.
+
+Final Answer:
+
+NexaAI provides 18 working days of annual leave to each employee per year.
+
+==========================
+
+===== SELF-RAG RESULT =====
+
+Question: What is Microsoft's Copilot pricing per user per month?
+Need Retrieval: True
+Retrieval Query: What is Microsoft's Copilot pricing per user per month?
+Rewrite Tries: 0
+Support Revision Tries: 0
+IsSUP: N/A
+Evidence: []
+IsUSE: N/A
+Usefulness Reason: 
+
+Final Answer:
+
+No answer found.
+
+==========================
+
+===== SELF-RAG RESULT =====
+
+Question: Where is NexaAI headquartered and when was it founded?
+Need Retrieval: True
+Retrieval Query: Where is NexaAI headquartered and when was it founded?
+Rewrite Tries: 0
+Support Revision Tries: 0
+IsSUP: fully_supported
+Evidence: ['Founded: 2021', 'Headquarters: Bengaluru, India']
+IsUSE: useful
+Usefulness Reason: Answer provides both headquarters location and founding year.
+
+Final Answer:
+
+NexaAI is headquartered in Bengaluru, India, and it was founded in 2021.
+
+==========================
+
+===== SELF-RAG RESULT =====
+
+Question: Describe NexaAI's company culture.
+Need Retrieval: True
+Retrieval Query: Describe NexaAI's company culture.
+Rewrite Tries: 0
+Support Revision Tries: 1
+IsSUP: fully_supported
+Evidence: ['NexaAI is committed to maintaining a fair, inclusive, and performance-driven workplace.', 'Employees are encouraged to maintain a healthy work-life balance.']
+IsUSE: useful
+Usefulness Reason: Answer provides a description of the company culture as requested.
+
+Final Answer:
+
+- "NexaAI is committed to maintaining a fair, inclusive, and performance-driven workplace."
+- "Employees are encouraged to maintain a healthy work-life balance."
+
+==========================
+
+===== SELF-RAG RESULT =====
+
+Question: What is NexaAI's annual leave policy, and what percentage refund does NexaAI provide when a customer cancels a plan?
+Need Retrieval: True
+Retrieval Query: NexaAI annual leave policy employee days refund percentage cancellation plan
+Rewrite Tries: 3
+
+Rewritten Queries:
+1. NexaAI annual leave policy employee days refund percentage cancellation plan
+2. NexaAI annual leave policy employee days refund percentage cancellation plan terms
+3. NexaAI annual leave policy employee days refund percentage cancellation plan
+Support Revision Tries: 0
+IsSUP: fully_supported
+Evidence: ['Annual Leave: 18 working days per year']
+IsUSE: not_useful
+Usefulness Reason: Refund percentage detail was not provided
+
+Final Answer:
+
+No answer found.
+
+==========================
+
