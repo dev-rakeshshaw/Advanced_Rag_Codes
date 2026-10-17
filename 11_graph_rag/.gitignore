@@ -18,3 +18,5 @@ scripts/
 # claude files
 .claude/
 CLAUDE.md
+
+Neo4J_Credentials.txt
