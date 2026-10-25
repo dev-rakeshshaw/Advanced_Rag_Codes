@@ -11,22 +11,28 @@ from qdrant_client.models import Distance, VectorParams
 
 load_dotenv()
 
-# ── Config ───────────────────────────────────────────────────────────────────
+# Config
+EMBEDDING_MODEL = os.getenv("OPENROUTER_EMBEDDING_MODEL", "nvidia/nemotron-3.5-embed-1b:free")
+EMBEDDING_DIM = 2048
 
-EMBEDDING_DIM = 1536  # text-embedding-3-small
+# Embeddings through OpenRouter
+base_embeddings = OpenAIEmbeddings(
+    model=EMBEDDING_MODEL,
+    api_key=os.environ["OPENROUTER_API_KEY"],
+    base_url=os.environ["OPENROUTER_BASE_URL"],
+)
 
-# ── Singletons ────────────────────────────────────────────────────────────────
-
-base_embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+# Local embedding cache
 embedding_file_store = LocalFileStore("./embedding_cache/")
 embeddings = CacheBackedEmbeddings.from_bytes_store(
     base_embeddings,
     embedding_file_store,
-    namespace=base_embeddings.model,
+    namespace=EMBEDDING_MODEL,
     query_embedding_cache=True,
     key_encoder="blake2b",
 )
 
+# Qdrant Cloud connection
 qdrant_client = QdrantClient(
     url=os.environ["QDRANT_URL"],
     api_key=os.environ["QDRANT_API_KEY"],
