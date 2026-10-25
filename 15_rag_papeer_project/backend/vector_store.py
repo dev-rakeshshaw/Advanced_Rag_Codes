@@ -1,3 +1,4 @@
+import re
 import os
 
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ load_dotenv()
 
 # Config
 EMBEDDING_MODEL = os.getenv("OPENROUTER_EMBEDDING_MODEL", "nvidia/nemotron-3.5-embed-1b:free")
+CACHE_NAMESPACE = re.sub(r"[^A-Za-z0-9_.-]", "_", EMBEDDING_MODEL)
 EMBEDDING_DIM = 2048
 
 # Embeddings through OpenRouter
@@ -20,6 +22,8 @@ base_embeddings = OpenAIEmbeddings(
     model=EMBEDDING_MODEL,
     api_key=os.environ["OPENROUTER_API_KEY"],
     base_url=os.environ["OPENROUTER_BASE_URL"],
+    check_embedding_ctx_length=False,
+    encoding_format="float",
 )
 
 # Local embedding cache
@@ -27,7 +31,7 @@ embedding_file_store = LocalFileStore("./embedding_cache/")
 embeddings = CacheBackedEmbeddings.from_bytes_store(
     base_embeddings,
     embedding_file_store,
-    namespace=EMBEDDING_MODEL,
+    namespace=CACHE_NAMESPACE,
     query_embedding_cache=True,
     key_encoder="blake2b",
 )
