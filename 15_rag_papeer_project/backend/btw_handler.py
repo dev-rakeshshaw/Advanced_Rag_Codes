@@ -10,7 +10,11 @@ from backend.models import BtwRouteDecision
 
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-5-mini")
+llm = ChatOpenAI(
+            model=os.getenv("OPENROUTER_CHAT_MODEL", "google/gemma-4-31b-it:free"),
+            api_key=os.environ["OPENROUTER_API_KEY"],
+            base_url=os.environ["OPENROUTER_BASE_URL"],
+        )
 
 
 def handle_btw(query: str) -> Generator[str, None, None]:

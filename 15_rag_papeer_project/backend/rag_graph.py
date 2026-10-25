@@ -23,7 +23,11 @@ from backend.vector_store import search as vs_search
 
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-5.4-mini")
+llm = ChatOpenAI(
+            model=os.getenv("OPENROUTER_CHAT_MODEL", "google/gemma-4-31b-it:free"),
+            api_key=os.environ["OPENROUTER_API_KEY"],
+            base_url=os.environ["OPENROUTER_BASE_URL"],
+        )
 
 
 # ── State ─────────────────────────────────────────────────────────────────────

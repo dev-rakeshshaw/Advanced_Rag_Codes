@@ -1,3 +1,4 @@
+import os
 import json
 import tempfile
 import uuid
@@ -22,7 +23,11 @@ def get_graph():
 
 
 SESSIONS_FILE = Path("sessions.json")
-_rename_llm = ChatOpenAI(model="gpt-5-mini")
+_rename_llm = ChatOpenAI(
+                    model=os.getenv("OPENROUTER_CHAT_MODEL", "google/gemma-4-31b-it:free"),
+                    api_key=os.environ["OPENROUTER_API_KEY"],
+                    base_url=os.environ["OPENROUTER_BASE_URL"],
+                )
 
 
 def load_sessions() -> dict:
