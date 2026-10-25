@@ -56,15 +56,6 @@ def _extract_arxiv_id(query: str) -> str | None:
     return None
 
 
-def _arxiv_api_lookup(arxiv_id: str) -> str:
-    """Fetch paper title by ID from the ArXiv Atom API."""
-    url = f"https://export.arxiv.org/api/query?id_list={arxiv_id}"
-    with urllib.request.urlopen(url, timeout=10) as resp:
-        xml = resp.read().decode()
-    titles = re.findall(r"<title>(.*?)</title>", xml, re.DOTALL)
-    return titles[1].strip() if len(titles) > 1 else arxiv_id
-
-
 def _arxiv_search(query: str) -> str:
     """Search ArXiv Atom API by title phrase and return the top result's bare paper ID."""
     phrase = query.strip('"')
@@ -76,6 +67,15 @@ def _arxiv_search(query: str) -> str:
     if not m:
         raise ValueError(f"No ArXiv paper found for: {query}")
     return re.sub(r"v\d+$", "", m.group(1))
+
+
+def _arxiv_api_lookup(arxiv_id: str) -> str:
+    """Fetch paper title by ID from the ArXiv Atom API."""
+    url = f"https://export.arxiv.org/api/query?id_list={arxiv_id}"
+    with urllib.request.urlopen(url, timeout=10) as resp:
+        xml = resp.read().decode()
+    titles = re.findall(r"<title>(.*?)</title>", xml, re.DOTALL)
+    return titles[1].strip() if len(titles) > 1 else arxiv_id
 
 
 def _load_arxiv_by_id(arxiv_id: str) -> list[Document]:
