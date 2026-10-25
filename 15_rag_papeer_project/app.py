@@ -30,13 +30,6 @@ _rename_llm = ChatOpenAI(
                 )
 
 
-def load_sessions() -> dict:
-    try:
-        return json.loads(SESSIONS_FILE.read_text(encoding="utf-8"))
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-
-
 def save_sessions(sessions_meta: dict) -> None:
     SESSIONS_FILE.write_text(json.dumps(sessions_meta, indent=2), encoding="utf-8")
 
@@ -137,6 +130,13 @@ def switch_session(session_id: str) -> None:
     if session_id not in st.session_state.turns:
         turn_count = sum(1 for m in st.session_state.chats[session_id] if m["role"] == "assistant")
         st.session_state.turns[session_id] = turn_count
+
+
+def load_sessions() -> dict:
+    try:
+        return json.loads(SESSIONS_FILE.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
 
 
 graph = get_graph()
