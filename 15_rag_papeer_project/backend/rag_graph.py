@@ -21,10 +21,10 @@ from tavily import TavilyClient
 from backend.models import ClaimVerificationResult, RelevancyDecision, RouterDecision
 from backend.vector_store import search as vs_search
 
-load_dotenv()
+load_dotenv(override=True)
 
 llm = ChatOpenAI(
-            model=os.getenv("OPENROUTER_CHAT_MODEL", "google/gemma-4-31b-it:free"),
+            model=os.getenv("OPENROUTER_CHAT_MODEL", "nvidia/nemotron-3.5-embed-1b:free"),
             api_key=os.environ["OPENROUTER_API_KEY"],
             base_url=os.environ["OPENROUTER_BASE_URL"],
         )

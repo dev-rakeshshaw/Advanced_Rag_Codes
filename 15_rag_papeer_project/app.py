@@ -24,7 +24,7 @@ def get_graph():
 
 SESSIONS_FILE = Path("./session/sessions.json")
 _rename_llm = ChatOpenAI(
-                    model=os.getenv("OPENROUTER_CHAT_MODEL", "google/gemma-4-31b-it:free"),
+                    model=os.getenv("OPENROUTER_CHAT_MODEL", "nvidia/nemotron-3.5-embed-1b:free"),
                     api_key=os.environ["OPENROUTER_API_KEY"],
                     base_url=os.environ["OPENROUTER_BASE_URL"],
                 )
