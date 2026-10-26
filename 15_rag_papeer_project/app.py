@@ -22,7 +22,7 @@ def get_graph():
     return build_graph()
 
 
-SESSIONS_FILE = Path("sessions.json")
+SESSIONS_FILE = Path("./session/sessions.json")
 _rename_llm = ChatOpenAI(
                     model=os.getenv("OPENROUTER_CHAT_MODEL", "google/gemma-4-31b-it:free"),
                     api_key=os.environ["OPENROUTER_API_KEY"],
