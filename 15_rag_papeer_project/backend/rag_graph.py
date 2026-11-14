@@ -24,7 +24,7 @@ from backend.vector_store import search as vs_search
 load_dotenv(override=True)
 
 llm = ChatOpenAI(
-            model=os.getenv("OPENROUTER_CHAT_MODEL", "nvidia/nemotron-3.5-embed-1b:free"),
+            model=os.getenv("OPENROUTER_CHAT_MODEL", "cohere/north-mini-code:free"),
             api_key=os.environ["OPENROUTER_API_KEY"],
             base_url=os.environ["OPENROUTER_BASE_URL"],
         )
