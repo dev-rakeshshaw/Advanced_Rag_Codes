@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import warnings
+import operator
 from typing import Annotated
 
 warnings.filterwarnings("ignore", message="The default value of `allowed_objects`")
@@ -14,7 +15,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import InjectedState, ToolNode, tools_condition
-from langgraph.types import Command
+from langgraph.types import Command, Overwrite
 from pydantic import BaseModel, Field
 from tavily import TavilyClient
 
@@ -36,7 +37,7 @@ class RAGState(MessagesState):
     session_id: str
     query: str
     route: str | None
-    retrieved_docs: list[Document]
+    retrieved_docs: Annotated[list[Document], operator.add]
     retrieval_attempts: int
     claim_verdict: str | None
     claim_source: str | None
@@ -72,13 +73,13 @@ ROUTER_PROMPT = ChatPromptTemplate.from_messages([
     ("human", "{query}"),
 ])
 
-router_chain = ROUTER_PROMPT | llm.with_structured_output(RouterDecision)
+router_chain = ROUTER_PROMPT | llm.with_structured_output(RouterDecision, method="function_calling",)
 
 
 def router_node(state: RAGState) -> dict:
     query = state["messages"][-1].content
     decision: RouterDecision = router_chain.invoke({"query": query})
-    return {"route": decision.route}
+    return {"route": decision.route, "retrieved_docs": Overwrite([]),}
 
 
 # ── Tool schemas ──────────────────────────────────────────────────────────────
@@ -100,7 +101,6 @@ def retrieve_from_vectorstore(
     query: str,
     k: int,
     session_id: Annotated[str, InjectedState("session_id")],
-    current_docs: Annotated[list, InjectedState("retrieved_docs")],
     tool_call_id: Annotated[str, InjectedToolCallId],
 ) -> list:
     """Search the uploaded research paper vector store for relevant passages."""
@@ -110,7 +110,11 @@ def retrieve_from_vectorstore(
     summary = f"Retrieved {len(docs)} chunk(s) from the vector store."
     return [
         ToolMessage(content=summary, tool_call_id=tool_call_id),
-        Command(update={"retrieved_docs": (current_docs or []) + docs}),
+        Command(
+        update={
+            "retrieved_docs": docs
+        }
+    ),
     ]
 
 
@@ -118,7 +122,6 @@ def retrieve_from_vectorstore(
 def web_search(
     optimized_query: str,
     max_results: int,
-    current_docs: Annotated[list, InjectedState("retrieved_docs")],
     tool_call_id: Annotated[str, InjectedToolCallId],
 ) -> list:
     """Search the web for current or supplementary information using Tavily."""
@@ -136,7 +139,11 @@ def web_search(
     summary = f"Found {len(web_docs)} web result(s) for: {optimized_query}"
     return [
         ToolMessage(content=summary, tool_call_id=tool_call_id),
-        Command(update={"retrieved_docs": (current_docs or []) + web_docs}),
+        Command(
+        update={
+            "retrieved_docs": web_docs
+        }
+    ),
     ]
 
 
@@ -176,7 +183,7 @@ RELEVANCY_CHECK_SYSTEM = (
     "no useful information.\n\nBe lenient: if there is any substantive overlap, return true."
 )
 
-relevancy_llm = llm.with_structured_output(RelevancyDecision)
+relevancy_llm = llm.with_structured_output(RelevancyDecision, method="function_calling",)
 
 QUERY_REWRITE_SYSTEM = (
     "You are a query rewriting assistant for a research paper retrieval system. "
@@ -232,7 +239,7 @@ def query_rewrite_node(state: RAGState) -> dict:
     return {
         "messages": [HumanMessage(content=rewritten)],
         "query": rewritten,
-        "retrieved_docs": [],
+        "retrieved_docs": Overwrite([]),
         "retrieval_attempts": 0,
         "rewrite_count": rewrite_count + 1,
         "is_relevant": None,
@@ -252,7 +259,7 @@ CLAIM_ANALYSIS_PROMPT = (
     "- verdict_summary should be 1-2 sentences suitable for display to the user."
 )
 
-verification_llm = llm.with_structured_output(ClaimVerificationResult)
+verification_llm = llm.with_structured_output(ClaimVerificationResult,  method="function_calling",)
 
 
 def verify_claim_node(state: RAGState) -> dict:
