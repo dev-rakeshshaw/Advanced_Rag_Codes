@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langchain_classic.embeddings import CacheBackedEmbeddings
 from langchain_classic.storage import LocalFileStore
 from langchain_core.documents import Document
-from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
@@ -13,17 +13,18 @@ from qdrant_client.models import Distance, VectorParams
 load_dotenv(override=True)
 
 # Config
-EMBEDDING_MODEL = os.getenv("OPENROUTER_EMBEDDING_MODEL", "nvidia/nemotron-3.5-embed-1b:free")
+EMBEDDING_MODEL = os.getenv(
+    "HF_EMBEDDING_MODEL",
+    "sentence-transformers/paraphrase-MiniLM-L3-v2",
+)
 CACHE_NAMESPACE = re.sub(r"[^A-Za-z0-9_.-]", "_", EMBEDDING_MODEL)
-EMBEDDING_DIM = 2048
+EMBEDDING_DIM = 384
 
 # Embeddings through OpenRouter
-base_embeddings = OpenAIEmbeddings(
-    model=EMBEDDING_MODEL,
-    api_key=os.environ["OPENROUTER_API_KEY"],
-    base_url=os.environ["OPENROUTER_BASE_URL"],
-    check_embedding_ctx_length=False,
-    encoding_format="float",
+base_embeddings = HuggingFaceEmbeddings(
+    model_name=EMBEDDING_MODEL,
+    model_kwargs={"device": "cpu"},
+    encode_kwargs={"normalize_embeddings": True},
 )
 
 # Local embedding cache
