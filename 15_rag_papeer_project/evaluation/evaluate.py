@@ -1,3 +1,4 @@
+import os
 import json
 import sys
 from pathlib import Path
@@ -21,28 +22,61 @@ from deepeval.metrics import (
 from deepeval.synthesizer import Synthesizer
 from deepeval.synthesizer.config import ContextConstructionConfig
 from deepeval.test_case import LLMTestCase
+from deepeval.models import DeepEvalBaseEmbeddingModel, OpenRouterModel
 
 from backend.paper_loader import load_document
 from backend.rag_graph import build_graph
-from backend.vector_store import add_paper
+from backend.vector_store import add_paper, embeddings
 
 load_dotenv()
 
+# OpenRouter LLM for DeepEval
+judge_model = OpenRouterModel(
+    model=os.environ["OPENROUTER_CHAT_MODEL"],
+    api_key=os.environ["OPENROUTER_API_KEY"],
+    base_url=os.environ["OPENROUTER_BASE_URL"],
+    temperature=0,
+)
+EVALUATION_DIR = Path(__file__).resolve().parent
 PDF_PATH            = "documents/Openclaw_Research_Report.pdf"
-GOLDENS_FILE        = Path("goldens.json")
+GOLDENS_FILE        = EVALUATION_DIR / "goldens.json"
 MAX_CONTEXTS        = 5
 GOLDENS_PER_CONTEXT = 2
 METRIC_THRESHOLD    = 0.7
+RESULTS_FILE = EVALUATION_DIR / "eval_results.json"
 
+# Reuse the existing cached local Hugging Face embeddings
+class LocalEmbeddingModel(DeepEvalBaseEmbeddingModel):
+
+    def load_model(self):
+        return embeddings
+
+    def embed_text(self, text: str) -> list[float]:
+        return self.load_model().embed_query(text)
+
+    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+        return self.load_model().embed_documents(texts)
+
+    async def a_embed_text(self, text: str) -> list[float]:
+        return self.embed_text(text)
+
+    async def a_embed_texts(self, texts: list[str]) -> list[list[float]]:
+        return self.embed_texts(texts)
+
+    def get_model_name(self) -> str:
+        return "Local HuggingFace MiniLM"
 
 def generate_goldens() -> list[dict]:
-    synthesizer = Synthesizer()
+    synthesizer = Synthesizer(model=judge_model)
     goldens = synthesizer.generate_goldens_from_docs(
         document_paths=[PDF_PATH],
         include_expected_output=True,
         max_goldens_per_context=GOLDENS_PER_CONTEXT,
         context_construction_config=ContextConstructionConfig(
             max_contexts_per_document=MAX_CONTEXTS,
+            embedder=LocalEmbeddingModel(),
+            critic_model=judge_model,
+            context_quality_threshold=0.0,
         ),
     )
     pairs = [
@@ -83,11 +117,11 @@ def main() -> None:
     graph = build_graph(db_path="eval_checkpoints.db")
 
     metrics = [
-        ContextualPrecisionMetric(threshold=METRIC_THRESHOLD, model="gpt-5.4-mini"),
-        ContextualRecallMetric(threshold=METRIC_THRESHOLD, model="gpt-5.4-mini"),
-        ContextualRelevancyMetric(threshold=METRIC_THRESHOLD, model="gpt-5.4-mini"),
-        AnswerRelevancyMetric(threshold=METRIC_THRESHOLD, model="gpt-5.4-mini"),
-        FaithfulnessMetric(threshold=METRIC_THRESHOLD, model="gpt-5.4-mini"),
+        ContextualPrecisionMetric(threshold=METRIC_THRESHOLD, model=judge_model),
+        ContextualRecallMetric(threshold=METRIC_THRESHOLD, model=judge_model),
+        ContextualRelevancyMetric(threshold=METRIC_THRESHOLD, model=judge_model),
+        AnswerRelevancyMetric(threshold=METRIC_THRESHOLD, model=judge_model),
+        FaithfulnessMetric(threshold=METRIC_THRESHOLD, model=judge_model),
     ]
 
     test_cases = []
@@ -129,9 +163,8 @@ def main() -> None:
             ],
         })
 
-    results_path = Path("eval_results.json")
-    results_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"\nResults saved to {results_path}.")
+    RESULTS_FILE.write_text(json.dumps(summary, indent=2, ensure_ascii=False),encoding="utf-8")
+    print(f"\nResults saved to {RESULTS_FILE}.")
 
 
 if __name__ == "__main__":
